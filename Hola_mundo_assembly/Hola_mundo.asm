@@ -1,5 +1,5 @@
 .data 
-saludo: .asciiz "Hola Mundo!" # Delcarams la etiqueta saludo
+saludo: .asciiz "Hola Mundo!" # Declaramos la etiqueta saludo
 
 .text 
 main:
