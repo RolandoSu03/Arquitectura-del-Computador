@@ -1,0 +1,166 @@
+\documentclass[letterpaper]{article}
+\usepackage[utf8]{inputenc} % Para tildes y caracteres especiales como la ñ
+\usepackage[spanish]{babel}  % Para la configuración del idioma español (fechas, etc.)
+\usepackage{booktabs}        % Para líneas de tabla profesionales (toprule, midrule, bottomrule)
+\usepackage{hyperref}        % Para enlaces internos en el PDF (secciones, tablas)
+\usepackage{amsmath}         % Útil para notación matemática, aunque no estrictamente necesario aquí
+\usepackage{geometry}        % Para controlar los márgenes de la página
+
+
+\geometry{a4paper, margin=1in}
+
+% --- Información del documento ---
+\title{Instrucciones y Registros en MIPS 32}
+\author{Rolando Suarez \\ 
+		V- 30.445.947}
+\date{}
+
+\begin{document}
+	
+	\maketitle 
+	
+	\begin{abstract}
+		Este documento proporciona un resumen detallado y completo de la arquitectura de conjuntos de instrucciones MIPS de 32 bits, centrándose en la organización de sus registros de propósito general y especial, así como en los formatos y categorías principales de sus instrucciones. MIPS, una arquitectura RISC fundamental, es explorada en su simplicidad y eficiencia para el procesamiento de datos.
+	\end{abstract}
+	
+	\section{Introducción a MIPS 32}
+	MIPS (Microprocessor without Interlocked Pipeline Stages) es una arquitectura de conjunto de instrucciones reducido (RISC) de 32 bits que se caracteriza por su simplicidad, regularidad y diseño optimizado para el \textit{pipelining}. Esto significa que las instrucciones son generalmente de longitud fija, tienen un formato sencillo y se ejecutan en un solo ciclo de reloj (cuando la pipeline está llena).
+	
+	\section{Registros MIPS 32}
+	Los registros son pequeñas ubicaciones de almacenamiento de alta velocidad directamente en la CPU, utilizadas para almacenar datos sobre los que se está operando activamente. MIPS-32 tiene 32 registros de propósito general (GPRs), cada uno de 32 bits de ancho, más algunos registros especiales.
+	
+	\subsection{Registros de Propósito General (GPRs)}
+	Aunque los registros son genéricos en su funcionalidad, existe una convención de uso establecida para facilitar la programación y la interoperabilidad de las funciones (llamada convención de llamada o \textit{calling convention}). Se nombran como \texttt{\$0} a \texttt{\$31}, o con un nombre simbólico que indica su propósito:
+	
+	\begin{table}[h!]
+		\centering 
+		\caption{Convención de uso de los Registros de Propósito General (GPRs) en MIPS 32} 
+		\label{tab:mips_registers} 
+		
+		\begin{tabular}{c c p{8cm}}
+			\toprule 
+			\textbf{Número} & \textbf{Nombre Simbólico} & \textbf{Propósito Convencional} \\
+			\midrule % Línea media (del paquete booktabs)
+			R0 & \texttt{\$zero} & \textbf{Siempre cero}. No se puede escribir en él; leer de él siempre devuelve 0. Muy útil. \\
+			R1 & \texttt{\$at} & \textbf{Ensamblador temporal}. Usado por el ensamblador para traducir pseudo-instrucciones. No debe ser usado por el programador directamente. \\
+			R2-R3 & \texttt{\$v0-\$v1} & \textbf{Valores de retorno de funciones}. Usados para devolver resultados de una función (e.g., \texttt{\$v0} para el resultado principal, \texttt{\$v1} para un segundo resultado o código de error). \\
+			R4-R7 & \texttt{\$a0-\$a3} & \textbf{Argumentos de funciones}. Usados para pasar los primeros cuatro argumentos a una función. \\
+			R8-R15 & \texttt{\$t0-\$t7} & \textbf{Temporales}. No se espera que se preserven a través de llamadas a funciones (la función que llama puede modificar su valor). \\
+			R16-R23 & \texttt{\$s0-\$s7} & \textbf{Temporales guardados}. Se espera que se preserven a través de llamadas a funciones. Si una función llamada los necesita, debe guardarlos en la pila y restaurarlos antes de retornar. \\
+			R24-R25 & \texttt{\$t8-\$t9} & \textbf{Más temporales}. Similar a \texttt{\$t0-\$t7}. \\
+			R26-R27 & \texttt{\$k0-\$k1} & \textbf{Reservado para el kernel del sistema operativo}. No deben ser usados por programas de usuario. \\
+			R28 & \texttt{\$gp} & \textbf{Puntero global (Global Pointer)}. Usado para acceder a variables globales de manera eficiente. \\
+			R29 & \texttt{\$sp} & \textbf{Puntero de pila (Stack Pointer)}. Apunta al tope de la pila de llamadas. Fundamental para la gestión de la memoria de las funciones. \\
+			R30 & \texttt{\$fp / \$s8} & \textbf{Puntero de marco (Frame Pointer)} o como \texttt{\$s8} (otro temporal guardado). Se usa para acceder a argumentos y variables locales en la pila. \\
+			R31 & \texttt{\$ra} & \textbf{Dirección de retorno (Return Address)}. Al realizar una llamada a función (\texttt{jal}), la dirección de la siguiente instrucción se guarda aquí para saber dónde volver. \\
+			\bottomrule 
+		\end{tabular}
+	\end{table}
+	
+	\subsection{Registros de Propósito Especial}
+	\begin{itemize}
+		\item \textbf{PC (Program Counter):} Contiene la dirección de memoria de la próxima instrucción a ejecutar. Se actualiza automáticamente.
+		\item \textbf{HI (High) y LO (Low):} Registros utilizados para almacenar los resultados de operaciones de multiplicación (los 64 bits de un producto de 32x32 se dividen entre HI y LO) y división (LO para el cociente, HI para el resto).
+	\end{itemize}
+	
+	\section{Instrucciones MIPS 32}
+	Todas las instrucciones MIPS son de \textbf{32 bits de longitud fija}, lo que simplifica enormemente la fase de \textit{fetch} y \textit{decode} de la CPU. Se agrupan en tres formatos principales:
+	
+	\subsection{Formatos de Instrucción}
+	\begin{enumerate}
+		\item \textbf{Formato R (Register):} Usado para operaciones que involucran únicamente registros.
+		\begin{itemize}
+			\item \textbf{Opcode (6 bits):} Código de operación principal.
+			\item \textbf{rs (5 bits):} Primer registro fuente.
+			\item \textbf{rt (5 bits):} Segundo registro fuente.
+			\item \textbf{rd (5 bits):} Registro destino donde se guarda el resultado.
+			\item \textbf{shamt (5 bits):} Cantidad de desplazamiento (para instrucciones de shift).
+			\item \textbf{funct (6 bits):} Código de función, para especificar la operación exacta cuando el opcode es el mismo (por ejemplo, para \texttt{ADD} vs \texttt{SUB} tienen el mismo opcode principal, pero diferente \texttt{funct}).
+		\end{itemize}
+		\textbf{Ejemplo:} \texttt{add \$rd, \$rs, \$rt} (\texttt{\$rd = \$rs + \$rt})
+		
+		\item \textbf{Formato I (Immediate):} Usado para operaciones con un operando inmediato (constante) o para instrucciones de carga/almacenamiento.
+		\begin{itemize}
+			\item \textbf{Opcode (6 bits):} Código de operación principal.
+			\item \textbf{rs (5 bits):} Registro fuente.
+			\item \textbf{rt (5 bits):} Registro destino (para resultado inmediato) o registro fuente/destino (para load/store).
+			\item \textbf{Immediate (16 bits):} Valor constante, dirección de memoria con signo (offset), o dirección de rama.
+		\end{itemize}
+		\textbf{Ejemplo:} \texttt{addi \$rt, \$rs, immediate} (\texttt{\$rt = \$rs + immediate})\\
+		\textbf{Ejemplo Load/Store:} \texttt{lw \$rt, offset(\$rs)} (\texttt{\$rt = Mem[\$rs + offset]})
+		
+		\item \textbf{Formato J (Jump):} Usado para saltos incondicionales.
+		\begin{itemize}
+			\item \textbf{Opcode (6 bits):} Código de operación principal.
+			\item \textbf{Target Address (26 bits):} Parte de la dirección de destino del salto.
+		\end{itemize}
+		\textbf{Ejemplo:} \texttt{j target\_address}
+	\end{enumerate}
+	
+	\subsection{Categorías de Instrucciones Comunes}
+	\begin{enumerate}
+		\item \textbf{Aritméticas:} Realizan operaciones matemáticas con enteros.
+		\begin{itemize}
+			\item \texttt{add rd, rs, rt}: Suma (con detección de overflow).
+			\item \texttt{addu rd, rs, rt}: Suma sin signo (sin detección de overflow).
+			\item \texttt{sub rd, rs, rt}: Resta (con detección de overflow).
+			\item \texttt{subu rd, rs, rt}: Resta sin signo.
+			\item \texttt{addi rt, rs, immediate}: Suma inmediata.
+			\item \texttt{mult rs, rt}: Multiplica \texttt{\$rs} por \texttt{\$rt}, resultado en \texttt{HI/LO}.
+			\item \texttt{div rs, rt}: Divide \texttt{\$rs} por \texttt{\$rt}, cociente en \texttt{LO}, resto en \texttt{HI}.
+		\end{itemize}
+		
+		\item \textbf{Lógicas:} Realizan operaciones bit a bit.
+		\begin{itemize}
+			\item \texttt{and rd, rs, rt}: AND lógico.
+			\item \texttt{or rd, rs, rt}: OR lógico.
+			\item \texttt{xor rd, rs, rt}: XOR lógico.
+			\item \texttt{nor rd, rs, rt}: NOR lógico.
+			\item \texttt{andi rt, rs, immediate}: AND inmediato.
+			\item \texttt{ori rt, rs, immediate}: OR inmediato.
+			\item \texttt{xori rt, rs, immediate}: XOR inmediato.
+		\end{itemize}
+		
+		\item \textbf{Desplazamiento (Shift):} Mueven bits dentro de un registro.
+		\begin{itemize}
+			\item \texttt{sll rd, rt, shamt}: Desplazamiento lógico a la izquierda.
+			\item \texttt{srl rd, rt, shamt}: Desplazamiento lógico a la derecha.
+			\item \texttt{sra rd, rt, shamt}: Desplazamiento aritmético a la derecha (preserva el signo).
+		\end{itemize}
+		
+		\item \textbf{Transferencia de Datos (Load/Store):} Mueven datos entre registros y memoria.
+		\begin{itemize}
+			\item \texttt{lw rt, offset(base)}: Carga una palabra (32 bits) de memoria a un registro.
+			\item \texttt{sw rt, offset(base)}: Almacena una palabra de un registro a memoria.
+			\item \texttt{lb rt, offset(base)}: Carga un byte (sign-extended).
+			\item \texttt{lbu rt, offset(base)}: Carga un byte sin signo.
+			\item \texttt{sb rt, offset(base)}: Almacena un byte.
+			\item \texttt{li rt, immediate}: Pseudo-instrucción para cargar un valor inmediato (el ensamblador lo traduce a \texttt{lui} + \texttt{ori} o \texttt{addi}).
+		\end{itemize}
+		
+		\item \textbf{Control de Flujo (Branches y Jumps):} Cambian la secuencia de ejecución del programa.
+		\begin{itemize}
+			\item \texttt{beq rs, rt, label}: Salto si \texttt{\$rs} es igual a \texttt{\$rt}.
+			\item \texttt{bne rs, rt, label}: Salto si \texttt{\$rs} no es igual a \texttt{\$rt}.
+			\item \texttt{j label}: Salto incondicional.
+			\item \texttt{jal label}: Salto y enlace (Jump and Link). Guarda la dirección de retorno en \texttt{\$ra} antes de saltar. Se usa para llamadas a funciones.
+			\item \texttt{jr rs}: Salto de registro (Jump Register). Salta a la dirección contenida en \texttt{\$rs}. Se usa para retornar de funciones (con \texttt{\$ra}).
+		\end{itemize}
+		
+		\item \textbf{Comparación y Establecimiento (Set on Less Than):}
+		\begin{itemize}
+			\item \texttt{slt rd, rs, rt}: Establece \texttt{\$rd} a 1 si \texttt{\$rs < \$rt}, 0 en caso contrario (con signo).
+			\item \texttt{sltu rd, rs, rt}: Establece \texttt{\$rd} a 1 si \texttt{\$rs < \$rt}, 0 en caso contrario (sin signo).
+			\item \texttt{slti rt, rs, immediate}: Establece si es menor que un inmediato (con signo).
+			\item \texttt{sltiu rt, rs, immediate}: Establece si es menor que un inmediato (sin signo).
+		\end{itemize}
+	\end{enumerate}
+	
+	\section{Consideraciones Adicionales}
+	\begin{itemize}
+		\item \textbf{Pseudo-instrucciones:} El ensamblador MIPS proporciona "pseudo-instrucciones" que son más fáciles de usar para el programador (ej. \texttt{move \$rd, \$rs}, \texttt{li \$rt, immediate}). El ensamblador las convierte internamente en una o más instrucciones MIPS reales.
+		\item \textbf{Endianness:} MIPS puede configurarse para ser \textit{Big-Endian} (el byte más significativo en la dirección de memoria más baja) o \textit{Little-Endian} (el byte menos significativo en la dirección de memoria más baja). Esto es crucial para la portabilidad de datos.
+		\item \textbf{Pipeline:} El diseño de MIPS está fuertemente enfocado en permitir una ejecución eficiente de instrucciones en un pipeline (una cadena de etapas de procesamiento). La uniformidad de las instrucciones y el acceso a los registros en posiciones fijas facilitan esto.
+	\end{itemize}
+	
+\end{document}
