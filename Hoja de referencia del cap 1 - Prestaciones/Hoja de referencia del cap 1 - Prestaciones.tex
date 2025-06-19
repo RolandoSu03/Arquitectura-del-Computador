@@ -1,0 +1,119 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{tabularx} % Añade este paquete para tablas con ancho fijo
+\usepackage{ragged2e} % Para justificar el texto en las celdas p{}
+
+% Configuración de márgenes
+\geometry{a4paper, margin=1in}
+\title{Hoja de Referencia\\del Capítulo 1 – Prestaciones}
+\author{Rolando Suarez\\
+		V-30445947}
+\date{}
+
+\begin{document}
+	
+	\maketitle
+	
+	\section*{Prestaciones}
+	Las prestaciones de un computador se refieren a la capacidad o eficiencia con la que una computadora realiza sus tareas y operaciones. En esencia, es una medida de qué tan bien y rápido puede un computador ejecutar programas, procesar datos y responder a las demandas del usuario.
+	
+	\subsection*{Conceptos Claves}
+	\begin{enumerate}[label=\arabic*)]
+		\item \textbf{Velocidad}
+		\begin{enumerate}[label=\alph*., noitemsep]
+			\item \textbf{Tiempo de respuesta (tiempo de ejecución):} Tiempo total requerido por un computador para completar una tarea, incluidos los accesos a discos, los accesos a memoria, las operaciones, sobrecarga del sistema operativo, tiempo de ejecución, etc.
+			\item \textbf{Productividad (ancho de banda):} Se define como el número de tareas que se completan por unidad de tiempo.
+		\end{enumerate}
+	\end{enumerate}
+	
+	\subsection*{Cálculo de Prestaciones}
+	Para maximizar las prestaciones, lo que se desea es minimizar el tiempo de respuesta o tiempo de ejecución del programa.
+	
+	Si las prestaciones de una máquina X son mayores que las de una máquina Y:
+	\[ \text{Prestaciones}_X > \text{Prestaciones}_Y \]
+	
+	A menudo se desea relacionar cuantitativamente las prestaciones de dos máquinas diferentes. Con esto se podría decir que ``X es n veces más rápida que Y'':
+	\[ \text{Prestaciones}_X = n \times \text{Prestaciones}_Y \]
+	Esto implica que el tiempo de ejecución de Y es n veces mayor que el de X:
+	\[ \text{Tiempo\_ejecución}_Y = n \times \text{Tiempo\_ejecución}_X \]
+	De estas relaciones, se deduce que:
+	\[ n = \frac{\text{Prestaciones}_X}{\text{Prestaciones}_Y} = \frac{\text{Tiempo\_ejecución}_Y}{\text{Tiempo\_ejecución}_X} \]
+	
+	\subsection*{Medición de las Prestaciones}
+	\begin{itemize}
+		\item Tiempo de ejecución – Segundos (s)
+	\end{itemize}
+	
+	\subsection*{Conceptos Claves (II)}
+	\begin{enumerate}[label=\arabic*)]
+		\item \textbf{Tiempo de ejecución de CPU:} Tiempo real que la CPU emplea en computar una tarea específica.
+		\item \textbf{Tiempo CPU del usuario:} Tiempo de CPU empleado en el propio programa.
+		\item \textbf{Tiempo CPU del sistema:} Tiempo que la CPU emplea en realizar tareas el sistema operativo.
+	\end{enumerate}
+	
+	\subsection*{Prestaciones de la CPU y sus Factores}
+	\textbf{Relación de los ciclos de reloj, tiempo del ciclo de reloj y tiempo de la CPU:}
+	\begin{itemize}[noitemsep]
+		\item Frecuencia del reloj es inversa al tiempo del ciclo:
+		\[ \text{Frecuencia del Reloj} = \frac{1}{\text{Tiempo del Ciclo}} \]
+		\[ \text{Tiempo del Ciclo} = \frac{1}{\text{Frecuencia del Reloj}} \]
+	\end{itemize}
+	
+	\subsection*{Prestaciones de las Instrucciones}
+	\textbf{Número de ciclos de reloj requeridos por un programa:}
+	\[ \text{Ciclos de Reloj} = \text{Número de Instrucciones} \times \text{CPI} \]
+	
+	\subsection*{Conceptos Claves (III)}
+	\begin{enumerate}[label=\arabic*)]
+		\item \textbf{Ciclos de reloj por instrucción (CPI):} Número medio de ciclos de reloj por instrucción para un programa o fragmento del programa.
+	\end{enumerate}
+	
+	\subsection*{Ecuación Clásica de las Prestaciones de la CPU}
+	Ahora se puede escribir la ecuación en términos del número de instrucciones, del CPI y del tiempo de ciclo:
+	\[ \text{Tiempo\_CPU} = \text{Número de Instrucciones} \times \text{CPI} \times \text{Tiempo del Ciclo} \]
+	O dada la frecuencia:
+	\[ \text{Tiempo\_CPU} = \frac{\text{Número de Instrucciones} \times \text{CPI}}{\text{Frecuencia del Reloj}} \]
+	
+	\subsection*{Tabla de Conversión de Unidades}
+	\begin{longtable}{ >{\RaggedRight}p{1.8cm} >{\centering}p{1cm} >{\centering}p{3.5cm} >{\RaggedRight}p{4cm} >{\RaggedRight\arraybackslash}p{4cm} }
+		\toprule
+		\textbf{Prefijo} & \textbf{Símbolo} & \textbf{Factor de Multiplicación} & \textbf{Equivalencia en Segundos (s)} & \textbf{Equivalencia en Hertz (Hz)} \\
+		\midrule
+		\endfirsthead % Encabezado para la primera página
+		\multicolumn{5}{c}{\tablename~\thetable{}: Continuación} \\
+		\toprule
+		\textbf{Prefijo} & \textbf{Símbolo} & \textbf{Factor de Multiplicación} & \textbf{Equivalencia en Segundos (s)} & \textbf{Equivalencia en Hertz (Hz)} \\
+		\midrule
+		\endhead 
+		\bottomrule
+		\endfoot 
+		\bottomrule
+		\endlastfoot 
+		
+		Pico & p & $10^{-12}$ & 1 ps = 0.000000000001 s & 1 pHz = $10^{-12}$ Hz \\
+		\addlinespace
+		Nano & n & $10^{-9}$ & 1 ns = 0.000000001 s & 1 nHz = $10^{-9}$ Hz \\
+		\addlinespace
+		Micro & $\mu$ & $10^{-6}$ & 1 $\mu$s = 0.000001 s & 1 $\mu$Hz = $10^{-6}$ Hz \\
+		\addlinespace
+		Mili & m & $10^{-3}$ & 1 ms = 0.001 s & 1 mHz = $10^{-3}$ Hz \\
+		\addlinespace
+		(Unidad Base) & - & $10^{0}$ & 1 s & 1 Hz \\
+		\addlinespace
+		Kilo & k & $10^{3}$ & - & 1 kHz = 1,000 Hz \\
+		\addlinespace
+		Mega & M & $10^{6}$ & - & 1 MHz = 1,000,000 Hz \\
+		\addlinespace
+		Giga & G & $10^{9}$ & - & 1 GHz = 1,000,000,000 Hz \\
+		
+	\end{longtable}
+	
+\end{document}
