@@ -1,0 +1,71 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{verbatim}
+
+\geometry{a4paper, margin=1in}
+
+\title{El Comando \texttt{time}}
+\author{Rolando Suarez\\
+		V- 30445947}
+\date{}
+
+\begin{document}
+	
+	\maketitle
+	
+	\section{Introducción}
+	El comando \texttt{time} es una utilidad fundamental en sistemas operativos tipo Unix (como Linux o macOS)  el cual se utiliza para medir el tiempo de ejecución de un programa o comando específico. Es una herramienta esencial para la monitorización básica del rendimiento de tareas.
+	
+	\section{Funcionamiento y Propósito}
+	Al ejecutar \texttt{time} seguido de un comando, el sistema ejecuta dicho comando y, una vez que este finaliza, \texttt{time} reporta estadísticas detalladas sobre el tiempo que el proceso tardó en completarse. Su propósito principal es ofrecer una visión rápida del consumo de tiempo de la Unidad Central de Procesamiento (CPU) y del tiempo total transcurrido durante la ejecución de una determinada tarea.
+	
+	\section{Métricas de Tiempo Reportadas}
+	La salida del comando \texttt{time} generalmente presenta tres valores de tiempo clave:
+	
+	\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+		\item \textbf{\texttt{real} (Tiempo Real o Wall Clock Time):}
+		\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+			\item Representa el tiempo total transcurrido desde el momento en que se inició el comando hasta su finalización, medido por un reloj externo.
+			\item Este valor incluye el tiempo que el proceso estuvo activo en la CPU, el tiempo que esperó por operaciones de Entrada/Salida (I/O), el tiempo que estuvo en estado de suspensión o inactividad, y el tiempo que otros procesos del sistema utilizaron la CPU.
+			\item Es el tiempo que un usuario percibiría directamente como la duración total de la ejecución.
+		\end{itemize}
+		
+		\item \textbf{\texttt{user} (Tiempo de Usuario):}
+		\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+			\item Indica la cantidad total de tiempo de CPU que el proceso invirtió ejecutando código en el espacio de usuario (user space).
+			\item Esto incluye el tiempo dedicado a la ejecución del propio código del programa y de las bibliotecas de usuario a las que este invoca.
+			\item No contabiliza el tiempo dedicado a operaciones de I/O ni a llamadas al sistema.
+		\end{itemize}
+		
+		\item \textbf{\texttt{sys} (Tiempo de Sistema o Tiempo de Kernel):}
+		\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+			\item Representa la cantidad total de tiempo de CPU que el proceso gastó ejecutando código en el espacio del kernel (kernel space).
+			\item Este tiempo se acumula cuando el programa realiza llamadas al sistema operativo para solicitar servicios (ej. operaciones de lectura/escritura de archivos, asignación de memoria, creación de procesos, interacción con el hardware).
+		\end{itemize}
+	\end{itemize}
+	
+	
+	\section{Consideraciones Relevantes}
+	\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+		\item \textbf{Implementaciones del Comando:} El comportamiento y el formato de salida de \texttt{time} pueden variar ligeramente dependiendo de la implementación.
+		\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+			\item \textbf{Shell Built-in:} En shells populares como Bash, Zsh o Fish, \texttt{time} es un comando incorporado. Su salida por defecto es concisa y se centra en las tres métricas principales.
+			\item \textbf{Utilidad Externa:} Existe una utilidad externa, generalmente ubicada en \texttt{/usr/bin/time}. Esta versión es más robusta, permite un formato de salida personalizado (opción \texttt{-f}) y puede reportar métricas adicionales como el uso de memoria o el número de fallos de página (page faults). Para invocar específicamente la versión externa, se puede usar \texttt{\textbackslash{}time} o la ruta completa \texttt{/usr/bin/time}.
+		\end{itemize}
+		\item \textbf{Interpretación de Resultados:}
+		\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+			\item Si el valor de \texttt{real} es considerablemente mayor que la suma de \texttt{user} + \texttt{sys}, sugiere que el programa es \textbf{I/O bound} (limitado por operaciones de entrada/salida) o que el sistema estuvo ocupado ejecutando otros procesos en paralelo.
+			\item Si la suma de \texttt{user} + \texttt{sys} es cercana al valor de \texttt{real}, indica que el programa es predominantemente \textbf{CPU bound} (limitado por el procesamiento de la CPU).
+			\item Valores elevados de \texttt{sys} pueden indicar que el programa realiza un uso intensivo de llamadas al sistema, lo cual es común en operaciones extensas de manipulación de archivos o gestión de memoria.
+		\end{itemize}
+		\item \textbf{Limitaciones:} \texttt{time} es una herramienta de alto nivel para una evaluación inicial del rendimiento. Para análisis de rendimiento más profundos y detallados (por ejemplo, perfiles de ejecución a nivel de función, análisis del uso de caché o trazado de llamadas al sistema), se requieren herramientas más especializadas como \texttt{perf}, \texttt{strace} o \texttt{Valgrind}.
+	\end{itemize}
+	
+	\section{Resumen}
+	El comando \texttt{time} es una utilidad simple pero efectiva para la medición fundamental del tiempo de ejecución de comandos y programas en sistemas Unix. Al reportar los tiempos \texttt{real}, \texttt{user} y \texttt{sys}, proporciona una visión rápida y valiosa sobre la duración total de una tarea y la distribución del uso de la CPU entre el código del programa y las interacciones con el sistema operativo, facilitando una primera aproximación a la identificación de posibles cuellos de botella en el rendimiento.
+	
+\end{document}
