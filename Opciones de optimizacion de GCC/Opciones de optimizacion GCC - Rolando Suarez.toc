@@ -1,0 +1,6 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{\numberline {1}Introducción a la Optimización en GCC}{2}{section.1}%
+\contentsline {section}{\numberline {2}Niveles de Optimización Predefinidos (\texttt {-O} Flags)}{2}{section.2}%
+\contentsline {section}{\numberline {3}Opciones de Optimización Individuales y LTO}{3}{section.3}%
+\contentsline {section}{\numberline {4}Tabla de Comandos de Optimización en GCC}{3}{section.4}%
+\contentsline {section}{\numberline {5}Consideraciones Finales}{4}{section.5}%

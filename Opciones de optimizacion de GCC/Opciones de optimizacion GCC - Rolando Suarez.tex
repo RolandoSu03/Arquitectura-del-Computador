@@ -1,0 +1,138 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{enumitem}
+
+\geometry{a4paper, margin=1in}
+
+\title{Opciones de Optimización de GCC}
+\author{Rolando Suarez\\
+		V- 30445947}
+\date{}
+
+\begin{document}
+	
+	\maketitle
+	
+	\section{Introducción a la Optimización en GCC}
+	GCC (GNU Compiler Collection) es un compilador fundamental en el desarrollo de software. Más allá de su función principal de traducir código fuente de lenguajes de alto nivel (como C, C++, Fortran, etc.) a código máquina ejecutable, GCC incorpora extensas capacidades de optimización. La optimización es el proceso mediante el cual el compilador aplica transformaciones al código intermedio y/o al código máquina generado, con el objetivo de mejorar sus características de rendimiento (velocidad de ejecución), consumo de recursos (uso de memoria, energía) o tamaño del binario resultante, sin alterar la semántica observable del programa.
+	
+	\section{Niveles de Optimización Predefinidos (\texttt{-O} Flags)}
+	GCC proporciona una serie de niveles de optimización predefinidos, especificados mediante el flag \texttt{-O} seguido de un valor numérico o alfabético. Cada nivel representa un conjunto acumulativo de opciones de optimización individuales activadas por el compilador.
+	
+	\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+		\item \textbf{\texttt{-O0} (Nivel Cero - Sin Optimización)}
+		\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+			\item \textbf{Comportamiento:} Es el nivel por defecto si no se especifica ninguna opción de \texttt{-O}. No se aplican optimizaciones.
+			\item \textbf{Características:} Prioriza la velocidad de compilación y la correspondencia directa entre el código fuente y el código máquina generado.
+			\item \textbf{Aplicación:} Ideal para fases de desarrollo y depuración, ya que facilita el seguimiento del flujo de ejecución en depuradores y mantiene la integridad de las variables y estructuras del código fuente.
+		\end{itemize}
+		
+		\item \textbf{\texttt{-O1} (Nivel Uno - Optimización Básica)}
+		\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+			\item \textbf{Comportamiento:} Activa un conjunto fundamental de optimizaciones que son consideradas seguras y que generalmente no aumentan significativamente el tiempo de compilación.
+			\item \textbf{Características:} Incluye optimizaciones como la eliminación de código inalcanzable (dead code elimination), la simplificación de expresiones y la eliminación de subexpresiones comunes.
+			\item \textbf{Aplicación:} Mejora el rendimiento sobre \texttt{-O0} sin dificultar excesivamente la depuración.
+		\end{itemize}
+		
+		\item \textbf{\texttt{-O2} (Nivel Dos - Optimización Estándar/Moderada)}
+		\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+			\item \textbf{Comportamiento:} Activa la mayoría de las optimizaciones de GCC que no implican una compensación significativa en el tiempo de compilación o el tamaño del código.
+			\item \textbf{Características:} Incluye todas las optimizaciones de \texttt{-O1} más: inlining de funciones pequeñas, optimizaciones de bucles, reordenamiento de instrucciones, y análisis avanzado de flujo de datos.
+			\textbf{Aplicación:} Es el nivel de optimización recomendado para la mayoría de las compilaciones de producción, ofreciendo un excelente equilibrio entre velocidad de ejecución, tamaño del binario y tiempo de compilación.
+		\end{itemize}
+		
+		\item \textbf{\texttt{-O3} (Nivel Tres - Optimización Agresiva para Velocidad)}
+		\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+			\item \textbf{Comportamiento:} Activa todas las optimizaciones de \texttt{-O2} junto con otras que son más agresivas.
+			\item \textbf{Características:} Puede aumentar el tiempo de compilación y, en algunos casos, el tamaño del código. Incluye optimizaciones como el desenrollado de bucles (loop unrolling) y el inlining de funciones de mayor tamaño.
+			\item \textbf{Aplicación:} Empleado cuando la velocidad de ejecución es la prioridad absoluta y se ha verificado que esta configuración mejora el rendimiento de la aplicación específica.
+		\end{itemize}
+		
+		\item \textbf{\texttt{-Os} (Optimización para Tamaño)}
+		\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+			\item \textbf{Comportamiento:} Prioriza la reducción del tamaño del ejecutable sobre la velocidad de ejecución.
+			\textbf{Características:} Activa todas las optimizaciones de \texttt{-O2} que no aumentan el tamaño del código, y específicamente aquellas destinadas a minimizar el tamaño del binario.
+			\item \textbf{Aplicación:} Crucial en entornos con recursos de memoria limitados, como sistemas embebidos, o cuando el tamaño del archivo es un factor crítico para la distribución o el almacenamiento.
+		\end{itemize}
+		
+		\item \textbf{\texttt{-Ofast} (Optimización Ultra-Agresiva)}
+		\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+			\item \textbf{Comportamiento:} Combina todas las optimizaciones de \texttt{-O3} con otras optimizaciones que pueden relajar la conformidad con estándares como IEEE 754 para aritmética de punto flotante (por ejemplo, permitiendo que las operaciones de punto flotante no sean estrictamente asociativas).
+			\item \textbf{Características:} Puede modificar la precisión de los cálculos de punto flotante y asumir ciertos comportamientos que no están garantizados por el estándar.
+			\item \textbf{Aplicación:} Requiere validación exhaustiva, ya que puede introducir comportamientos numéricos diferentes o errores en aplicaciones sensibles a la precisión. Su uso se limita a escenarios donde las ganancias de rendimiento justifican los riesgos asociados.
+		\end{itemize}
+		
+		\item \textbf{\texttt{-Og} (Optimización para Depuración)}
+		\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+			\item \textbf{Comportamiento:} Representa un compromiso entre la ausencia de optimización de \texttt{-O0} y la complejidad de depuración de niveles superiores.
+			\item \textbf{Características:} Aplica optimizaciones mínimas que no reorganizan sustancialmente el código fuente, manteniendo una buena correspondencia para facilitar la depuración, mientras ofrece un rendimiento ligeramente superior a \texttt{-O0}.
+			\textbf{Aplicación:} Adecuado durante el desarrollo cuando se requiere un rendimiento algo mejor sin comprometer la capacidad de depuración efectiva.
+		\end{itemize}
+	\end{itemize}
+	
+	\section{Opciones de Optimización Individuales y LTO}
+	Los flags \texttt{-O} son macros que activan múltiples opciones individuales de optimización. Los desarrolladores avanzados pueden especificar estas opciones de forma granular para un control más preciso.
+	
+	Una técnica avanzada es la \textbf{Optimización en Tiempo de Enlace (LTO - Link-Time Optimization)}, activada con el flag \texttt{-flto}. LTO permite que el compilador y el enlazador consideren la totalidad del código del programa (o grandes secciones del mismo) durante la fase de optimización. Esto facilita optimizaciones interprocedurales y a nivel de programa completo que no serían posibles si los módulos se optimizaran de forma aislada.
+	\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+		\item \textbf{Beneficios:} Potencialmente genera ejecutables más pequeños y más rápidos.
+		\item \textbf{Consideraciones:} Aumenta significativamente el tiempo de compilación y el consumo de memoria durante la fase de enlazado.
+	\end{itemize}
+	
+	\section{Tabla de Comandos de Optimización en GCC}
+	A continuación, se presenta una tabla resumen de los comandos de optimización clave en GCC con su sintaxis y su propósito:
+	
+	\begin{longtable}{l p{4.5cm} p{8cm}}
+		\toprule
+		\textbf{Comando de Optimización} & \textbf{Sintaxis (Ejemplo)} & \textbf{Descripción Funcional y Uso Principal} \\
+		\midrule
+		\endfirsthead
+		\multicolumn{3}{c}{\tablename~\thetable{}: Continuación} \\
+		\toprule
+		\textbf{Comando de Optimización} & \textbf{Sintaxis (Ejemplo)} & \textbf{Descripción Funcional y Uso Principal} \\
+		\midrule
+		\endhead
+		\bottomrule
+		\endfoot
+		\bottomrule
+		\endlastfoot
+		
+		\texttt{-O0} & \texttt{gcc -O0 archivo.c -o ejecutable} & \textbf{Desactivación de optimizaciones.} Produce una traducción directa del código fuente al ejecutable. Prioriza la velocidad de compilación y la depurabilidad. \\
+		\addlinespace
+		\texttt{-O1} & \texttt{gcc -O1 archivo.c -o ejecutable} & \textbf{Optimización básica.} Habilita un conjunto de optimizaciones seguras que mejoran ligeramente el rendimiento sin un gran impacto en el tiempo de compilación o la depuración. \\
+		\addlinespace
+		\texttt{-O2} & \texttt{gcc -O2 archivo.c -o ejecutable} & \textbf{Optimización estándar.} Habilita la mayoría de las optimizaciones, buscando un equilibrio entre rendimiento y tiempo/recursos de compilación. Recomendado para la mayoría de las compilaciones de producción. \\
+		\addlinespace
+		\texttt{-O3} & \texttt{gcc -O3 archivo.c -o ejecutable} & \textbf{Optimización agresiva por velocidad.} Activa todas las optimizaciones de \texttt{-O2} más algunas de mayor impacto en el rendimiento, pero que pueden incrementar el tiempo de compilación y/o el tamaño del binario. \\
+		\addlinespace
+		\texttt{-Os} & \texttt{gcc -Os archivo.c -o ejecutable} & \textbf{Optimización por tamaño.} El objetivo es generar el ejecutable más pequeño posible, incluso si eso significa sacrificar un poco de velocidad. Muy útil para sistemas embebidos o donde el espacio de almacenamiento es crítico. \\
+		\addlinespace
+		\texttt{-Ofast} & \texttt{gcc -Ofast archivo.c -o ejecutable} & \textbf{Optimización ultra-agresiva.} Incluye \texttt{-O3} y optimizaciones que relajan la conformidad con los estándares (ej. IEEE 754), pudiendo alterar la precisión numérica. Requiere validación rigurosa del comportamiento del programa. \\
+		\addlinespace
+		\texttt{-Og} & \texttt{gcc -Og archivo.c -o ejecutable} & \textbf{Optimización para depuración.} Aplica optimizaciones mínimas que no obfusan el código de manera significativa, permitiendo un rendimiento mejor que \texttt{-O0} sin dificultar la depuración. \\
+		\addlinespace
+		\texttt{-flto} & \texttt{gcc -O2 -flto archivo.c -o ejecutable} & \textbf{Optimización en Tiempo de Enlace (LTO).} Habilita optimizaciones interprocedurales y a nivel de programa completo al permitir que el compilador y enlazador analicen todos los módulos del código. Incrementa el tiempo de compilación final y el uso de memoria. \\
+		\addlinespace
+		\texttt{-fPIC} & \texttt{gcc -fPIC libreria.c -o libreria.so} & \textbf{Generación de Código Independiente de la Posición (Position-Independent Code).} Esencial para la creación de bibliotecas compartidas (\texttt{.so}, \texttt{.dll}), permitiendo que el código se cargue en cualquier dirección de memoria sin modificaciones. \\
+		\addlinespace
+		\texttt{-march=native} & \texttt{gcc -O2 -march=native archivo.c -o ejecutable} & \textbf{Optimización específica de la arquitectura local.} Genera código binario altamente optimizado para la CPU en la que se realiza la compilación, utilizando conjuntos de instrucciones específicos (ej. AVX, SSE). El binario resultante \textbf{no es portátil} a otras arquitecturas. \\
+		\addlinespace
+		\texttt{-mtune=native} & \texttt{gcc -O2 -mtune=native archivo.c -o ejecutable} & \textbf{Optimización de microarquitectura.} Ajusta las optimizaciones del código para un rendimiento óptimo en la microarquitectura de la CPU actual (ej. Skylake, Zen 2), sin necesariamente utilizar instrucciones que comprometan la portabilidad. \\
+	\end{longtable}
+	
+	\section{Consideraciones Finales}
+	La aplicación de optimizaciones debe ser un proceso informado. Niveles de optimización más altos generalmente llevan a:
+	\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+		\item \textbf{Mayor tiempo de compilación:} El compilador dedica más recursos y tiempo al análisis y transformación del código.
+		\item \textbf{Posible aumento del tamaño del binario:} Aunque el objetivo es la velocidad, algunas optimizaciones pueden expandir el código.
+		\item \textbf{Complejidad en la depuración:} Las transformaciones del código pueden dificultar la correlación entre el código fuente y las instrucciones de máquina, afectando el seguimiento de variables y puntos de interrupción.
+	\end{itemize}
+	La elección del nivel de optimización debe basarse en el objetivo principal del proyecto (rendimiento vs. tamaño), los requisitos de depuración y, preferiblemente, en métricas de rendimiento obtenidas mediante benchmarking. Para la mayoría de los casos, \texttt{-O2} representa un equilibrio óptimo entre rendimiento y eficiencia de desarrollo.
+	
+\end{document}
